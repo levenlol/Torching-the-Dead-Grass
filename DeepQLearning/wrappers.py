@@ -16,14 +16,15 @@ class FireResetEnv(gym.Wrapper):
         return self.env.step(action)
 
     def reset(self):
+        info = {}
         self.env.reset()
-        obs, _, done, terminated, _ = self.env.step(1)
+        obs, _, done, terminated, info = self.env.step(1)
         if done or terminated:
             self.env.reset()
-        obs, _, done, terminated, _ = self.env.step(2)
+        obs, _, done, terminated, info = self.env.step(2)
         if done or terminated:
             self.env.reset()
-        return obs
+        return obs, info
 
 
 class MaxAndSkipEnv(gym.Wrapper):
@@ -103,7 +104,8 @@ class BufferWrapper(gym.ObservationWrapper):
 
     def reset(self):
         self.buffer = np.zeros_like(self.observation_space.low, dtype=self.dtype)
-        return self.observation(self.env.reset())
+        obs, info = self.env.reset()
+        return self.observation(obs), info
 
     def observation(self, observation):
         self.buffer[:-1] = self.buffer[1:]
